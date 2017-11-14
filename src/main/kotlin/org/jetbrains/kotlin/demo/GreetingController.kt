@@ -22,32 +22,30 @@ class GreetingController {
     val counter = AtomicLong()
 
     @GetMapping("/greeting")
-    fun greeting(@RequestParam(value = "name", defaultValue = "World") name: String) : Greeting {
-        var sourceURL = "https://protege.stanford.edu/ontologies/pizza/pizza.owl";
-        var namespace = sourceURL + "#";
-        var base = ModelFactory.createOntologyModel( OntModelSpec.OWL_MEM );
+    fun greeting(@RequestParam(value = "name", defaultValue = "World") name: String) : List<String> {
+        val sourceURL = "pizza.owl";
+        val namespace = sourceURL + "#";
+        val base = ModelFactory.createOntologyModel( OntModelSpec.OWL_MEM );
         base.read( sourceURL, "RDF/XML" );
-        println("HIHIHIHIHI")
 
+        val inf = ModelFactory.createOntologyModel( OntModelSpec.OWL_MEM_MICRO_RULE_INF, base );
 
-        var inf = ModelFactory.createOntologyModel( OntModelSpec.OWL_MEM_MICRO_RULE_INF, base );
+        var asp = inf.getOntClass( "http://www.co-ode.org/ontologies/pizza/pizza.owl#MeatTopping");
 
-        var classes = inf.listClasses();
-        while (classes.hasNext()) {
-            var essaClasse = classes.next();
-
-            var vClasse = essaClasse.getLocalName();
-            if(vClasse != null)
-                println("${vClasse}");
+        // Print each of its instances.
+        for ( i in asp.listInstances() ) {
+            println( i );
         }
-//
-//        System.out.println("\n---- Inferred assertions ----");
-//        paper = inf.getIndividual( namespace + "paper1" );
-//        for (i in paper.listRDFTypes(false)) {
-//            print( "${paper.getURI()} is a ${i}" );
-//        }
+        println("hi!");
 
-         return Greeting(counter.incrementAndGet(), "Hello, $name")
+        val classes = inf.listClasses();
+        var list = mutableListOf<String>();
+        while (classes.hasNext()) {
+            val essaClasse = classes.next();
+            list.add(essaClasse.toString());
+        }
+
+        return list
     }
 
 }
