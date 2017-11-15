@@ -1,11 +1,12 @@
-## Spring Boot Example
+## ontology grapher
 
-This is a basic example of how to use Kotlin in a Spring Boot application. See the [accompanying tutorial](http://kotlinlang.org/docs/tutorials/spring-boot-restful.html)
-for more information.
+A kotlin server side for visualizing ontologies
 
-To run:
+
+### Usage
 
 ```
-$ ./gradlew bootRun
+$ gradle  bootRun
 ```
+
 
