@@ -31,33 +31,27 @@ function processParents(cy, graph, term, depth) {
         nodesCy[term] = {
             data: {
                 id: term,
-                label: utils.explode(node.description, 22),
+                label: utils.explode(node.name, 22),
                 score: -Math.log(nodeScores[term]) * 150,
                 pval: nodeScores[term],
             },
         };
     }
-    relationships.forEach((elt) => {
-        var list = node[elt];
-        if (list) {
-            list.forEach((tangentialTerm) => {
-                var tangentialNode = graph[tangentialTerm];
-                if (!nodesCy[tangentialTerm]) {
-                    nodesCy[tangentialTerm] = {
-                        data: {
-                            id: tangentialTerm,
-                            label: utils.explode((tangentialNode || {}).description || tangentialTerm, 22),
-                        },
-                    };
-                }
-            });
-        }
-    });
-    if (node.parents) {
-        for (var i = 0; i < node.parents.length; i++) {
-            if (depth < depthLimit) {
-                processParents(cy, graph, node.parents[i], depth + 1);
+    var list = node.parents;
+    if (list) {
+        list.forEach((tangentialTerm) => {
+            var tangentialNode = graph[tangentialTerm];
+            if (!nodesCy[tangentialTerm]) {
+                nodesCy[tangentialTerm] = {
+                    data: {
+                        id: tangentialTerm,
+                        label: utils.explode((tangentialNode || {}).name || tangentialTerm, 22),
+                    },
+                };
             }
+        });
+        for (var i = 0; i < node.parents.length; i++) {
+            processParents(cy, graph, node.parents[i], depth + 1);
         }
     }
 }
@@ -69,32 +63,29 @@ function processParentsEdges(cy, graph, term, depth) {
         return;
     }
 
-    relationships.forEach((elt) => {
-        if (node[elt]) {
-            for (var i = 0; i < node[elt].length; i++) {
-                var edgeName = `${term},${node[elt][i]}-${elt}`;
-                if (!edgesCy[edgeName]) {
-                    var target = node[elt][i];
-                    var source = term;
+    if (node.parents) {
+        for (var i = 0; i < node.parents.length; i++) {
+            var edgeName = `${term},${node.parents[i]}`;
+            if (!edgesCy[edgeName]) {
+                var target = node.parents[i];
+                var source = term;
 
-                    edgesCy[edgeName] = {
-                        data: {
-                            label: elt,
-                            id: edgeName,
-                            target: target,
-                            source: source,
-                        },
-                    };
-                    if (depth < depthLimit && elt === 'parents') {
-                        processParentsEdges(cy, graph, node[elt][i], depth + 1);
-                    }
-                }
+                edgesCy[edgeName] = {
+                    data: {
+                        label: 'parents',
+                        id: edgeName,
+                        target: target,
+                        source: source,
+                    },
+                };
+                processParentsEdges(cy, graph, node.parents[i], depth + 1);
             }
         }
-    });
+    }
 }
 
 function setupGraph(graph, term) {
+    console.log(graph, term);
     var stylesheetCy = cytoscape.stylesheet()
         .selector('node')
         .style({
@@ -205,6 +196,7 @@ function downloadAndSetupGraph(term) {
     
 
     $.ajax({ url: 'http://localhost:4567/ontology', dataType: 'json' }).done((res) => {
+        console.log(res)
         setupGraph(res, term);
         $('#loading').text('');
     });
