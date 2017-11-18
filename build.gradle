@@ -26,7 +26,8 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version" // Required for Kotlin integration
-    compile('org.apache.jena:apache-jena-libs:3.5.0')
-    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile "org.apache.jena:apache-jena-libs:3.5.0"
+    compile "org.springframework.boot:spring-boot-starter-web"
+    compile "com.sparkjava:spark-kotlin:1.0.0-alpha"
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
